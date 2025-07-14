@@ -1,0 +1,53 @@
+sim_dt: 0.001         # 物理仿真时间步长（单位：秒）
+control_dt: 0.025     # 控制决策时间步长（单位：秒）
+obs_history_len: 1    # 观测历史长度（保留1帧，即仅用当前观测）
+action_smoothing: 0.5 # 动作平滑系数（0~1，值越大动作变化越平缓）
+
+ctrllimited: false    # 是否限制控制信号范围（false：不限制，由代码逻辑处理）
+jointlimited: false   # 是否限制关节运动范围（false：不限制，依赖模型XML中的joint.range）
+reduced_xml: true     # 是否使用简化模型（true：加载简化版XML，减少几何/物理参数，提升速度）
+
+init_noise: 3         # 初始化噪声幅度（关节初始位置的随机扰动范围，单位：弧度）
+
+pdgains:              # PD控制器增益（[kp, kv]，对应每个关节的比例/微分系数）
+  "left_hip_yaw_joint": [100, 10]
+  "left_hip_roll_joint": [100, 10]
+  "left_hip_pitch_joint": [100, 10]
+  "left_knee_joint": [100, 10]
+  "left_ankle_joint": [20, 4]
+  "right_hip_yaw_joint": [100, 10]
+  "right_hip_roll_joint": [100, 10]
+  "right_hip_pitch_joint": [100, 10]
+  "right_knee_joint": [100, 10]
+  "right_ankle_joint": [20, 4]
+  "torso_joint": [40, 4]
+  "left_shoulder_pitch_joint": [20, 2]
+  "left_shoulder_roll_joint": [20, 2]
+  "left_shoulder_yaw_joint": [20, 2]
+  "left_elbow_joint": [20, 2]
+  "right_shoulder_pitch_joint": [20, 2]
+  "right_shoulder_roll_joint": [20, 2]
+  "right_shoulder_yaw_joint": [20, 2]
+  "right_elbow_joint": [20, 2]
+
+observation_noise:
+  enabled: true               # 是否启用观测噪声（true：模拟真实传感器误差）
+  multiplier: 1.0             # 噪声幅度缩放因子（1.0表示使用原始scales值）
+  type:  "uniform"            # 噪声分布类型（uniform：均匀分布；gaussian：高斯分布）
+  scales:                     # 各观测项的噪声幅度
+    root_orient: 0.05         # 躯干姿态（四元数）的噪声幅度
+    root_ang_vel: 0.05        # 躯干角速度噪声
+    motor_pos: 0.02           # 电机位置噪声
+    motor_vel: 0.05           # 电机速度噪声
+    motor_tau: 5.0            # 电机力矩噪声
+
+perturbation:
+  enable: true                      # 是否启用外部扰动（true：主动施加力/力矩干扰）
+  bodies: ["pelvis", "torso_link"]  # 受扰动的部件（骨盆和躯干）
+  force_magnitude: 10               # 力扰动幅度（单位：N）
+  torque_magnitude: 2               # 力矩扰动幅度（单位：N·m）
+  interval: 5                       # 扰动间隔（每5步仿真施加一次）
+
+dynamics_randomization:
+  enable: true                # 是否启用动力学随机化（true：随机调整物理参数）
+  interval: 0.5               # 随机化间隔（每0.5秒调整一次）
